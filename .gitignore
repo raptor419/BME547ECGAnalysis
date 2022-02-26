@@ -26,3 +26,6 @@ venv/
 
 # JSON Files
 *.json
+
+# Log Files
+*.log
