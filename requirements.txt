@@ -6,3 +6,4 @@ argparse
 coverage
 testfixtures
 py-ecg-detectors
+simplejson
