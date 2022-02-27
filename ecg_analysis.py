@@ -37,13 +37,33 @@ def process_raw(file_df, filename="test"):
     for line, nan in na_lines.iteritems():
         if nan:
             logging.error("Non-Numeric value in line {0}, "
-                          "skipping".format(str(line)))
+                          "skipping.".format(str(line)))
     ex_lines = abs(file_df['voltage']) > 300
     if ex_lines.any():
         logging.warning("Voltage exceeded normal range "
                         "in file {0}".format(filename))
     processed_df = file_df[~na_lines]
     return processed_df
+
+
+def main(filename, output_name=None):
+    """
+    Driver function for program
+
+    Main driver function for the program that takes in the
+    input filename and output filename as parameters and runs the
+    program
+
+    :param filename: input filename
+    :param output_name: output filename
+    :return: json file as output
+    """
+
+    if output_name is None:
+        output_name = ''.join(filename.split(".")[:-1] + [".json"])
+    df = readfile_raw(filename)
+    df = process_raw(df, filename)
+    df.to_csv(output_name)
 
 
 if __name__ == "__main__":
@@ -68,6 +88,4 @@ if __name__ == "__main__":
     else:
         output = ''.join(file.split(".")[:-1] + [".json"])
 
-    df = readfile_raw(file)
-    df = process_raw(df)
-    print(df)
+    main(file, output)
