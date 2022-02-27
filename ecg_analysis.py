@@ -19,7 +19,7 @@ def readfile_raw(filename):
     return file_df
 
 
-def process_raw(file_df):
+def process_raw(file_df, filename="test"):
     """
     Process and log non-numeric or NaN values from dataframe
 
@@ -27,17 +27,43 @@ def process_raw(file_df):
     user with the line number the error was found, removes the
     line returns a processed dataframe.
 
+    :param filename:
     :param file_df: pandas.DataFrame from the input csv file
     :return: processed pandas.DataFrame
     """
-    file_df = file_df.apply(pd.to_numeric, errors='coerce').astype(float)
+    file_df = file_df.apply(pd.to_numeric, errors='coerce')
+    file_df = file_df.astype(float)
     na_lines = file_df.isna().any(axis=1)
     for line, nan in na_lines.iteritems():
         if nan:
-            logging.warning("Non-Numeric value in line {0}, "
-                            "skipping".format(str(line)))
+            logging.error("Non-Numeric value in line {0}, "
+                          "skipping.".format(str(line)))
+    ex_lines = abs(file_df['voltage']) > 300
+    if ex_lines.any():
+        logging.warning("Voltage exceeded normal range "
+                        "in file {0}".format(filename))
     processed_df = file_df[~na_lines]
     return processed_df
+
+
+def main(filename, output_name=None):
+    """
+    Driver function for program
+
+    Main driver function for the program that takes in the
+    input filename and output filename as parameters and runs the
+    program
+
+    :param filename: input filename
+    :param output_name: output filename
+    :return: json file as output
+    """
+
+    if output_name is None:
+        output_name = ''.join(filename.split(".")[:-1] + [".json"])
+    df = readfile_raw(filename)
+    df = process_raw(df, filename)
+    df.to_csv(output_name)
 
 
 if __name__ == "__main__":
@@ -55,13 +81,11 @@ if __name__ == "__main__":
         file = args.input
     else:
         file = "test_data/test_data1.csv"
-        logging.warning("No input file given, using default "+file)
+        logging.warning("No input file given, using default {0}".format(file))
 
     if args.output:
         output = args.output
     else:
         output = ''.join(file.split(".")[:-1] + [".json"])
 
-    df = readfile_raw(file)
-    df = process_raw(df)
-    print(df)
+    main(file, output)

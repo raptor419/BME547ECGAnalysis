@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
 import pandas as pd
+from testfixtures import LogCapture
 
 df1 = pd.DataFrame([[1.0, 1.0],
                     [1.0, np.nan]],
@@ -71,3 +72,38 @@ def test_process_raw(file_df, expected_df):
     processed_df = process_raw(file_df)
     print(processed_df, expected_df)
     assert (processed_df.equals(expected_df))
+
+
+df1 = pd.DataFrame([[1, 2], [1, np.nan]], columns=['time', 'voltage'])
+df1_exp = ("root", "ERROR", "Non-Numeric value in line {0}, "
+                            "skipping.".format(str(1)))
+df2 = pd.DataFrame([[1, 2], [1, 350]], columns=['time', 'voltage'])
+df2_exp = ("root", "WARNING", "Voltage exceeded normal range "
+                              "in file {0}".format("test"))
+df3 = pd.DataFrame([[1, 2], [1, 3]], columns=['time', 'voltage'])
+df3_exp = ()
+
+
+df_data = [
+    (df1, df1_exp),
+    (df2, df2_exp),
+    (df3, df3_exp),
+]
+
+
+@pytest.mark.parametrize("df, log", df_data)
+def test_process_raw_log(df, log):
+    from ecg_analysis import process_raw
+    with LogCapture() as log_c:
+        process_raw(df)
+    if log:
+        log_c.check(log)
+    else:
+        log_c.check()
+
+
+def test_main():
+    from ecg_analysis import main
+    for i in [1, 2, 3, 4, 5, 6, 7, 10,
+              11, 16, 20, 22, 23, 28, 32]:
+        main("test_data/test_data"+str(i)+".csv")
