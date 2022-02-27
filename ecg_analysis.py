@@ -1,7 +1,9 @@
+import json
 import argparse
 import logging
 import pandas as pd
 from ecgdetectors import Detectors
+pd.set_option("display.precision", 16)
 
 
 def readfile_raw(filename):
@@ -66,6 +68,36 @@ def detect_beats(df):
     return times
 
 
+def get_metrics(df):
+    """
+    A function that takes in the ECG data dataframe and
+    outputs calculated metrics
+
+    The function calculates and returns the following in a dictionary
+    The following data should be calculated and saved as keys in a Python
+    dictionary called metrics
+
+    1. duration: time duration of the ECG strip as a numeric value
+    2. voltage_extremes: tuple in the form (min, max) where min and max are
+    the minimum and maximum lead voltages as found in the raw data file.
+    3. num_beats: number of detected beats in the strip, as a numeric value
+    4. mean_hr_bpm: estimated average heart rate over the
+    length of the strip as a numeric value
+    5. attribute beats: list of times when a beat occurred.
+
+    :param df: dataframe with columns time and voltage
+    :return: a dict of metrics params
+    """
+    metrics = dict()
+    metrics['duration'] = df.iloc[-1].time - df.iloc[0].time
+    metrics['min'] = df['voltage'].min()
+    metrics['max'] = df['voltage'].max()
+    metrics['beats'] = list(detect_beats(df))
+    metrics['num_beats'] = len(metrics['beats'])
+    metrics['mean_hr_bpm'] = metrics['num_beats']/(metrics['duration']/60)
+    return metrics
+
+
 def main(filename, output_name=None):
     """
     Driver function for program
@@ -82,7 +114,11 @@ def main(filename, output_name=None):
         output_name = ''.join(filename.split(".")[:-1] + [".json"])
     df = readfile_raw(filename)
     df = process_raw(df, filename)
-    df.to_csv(output_name)
+    metrics = get_metrics(df)
+    json_str = json.dumps(metrics, indent=4)
+    with open(output_name, 'w+') as fp:
+        json.dump(metrics, fp, indent=4)
+    return json_str
 
 
 if __name__ == "__main__":
