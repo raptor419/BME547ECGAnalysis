@@ -1,6 +1,7 @@
 import argparse
 import logging
 import pandas as pd
+from ecgdetectors import Detectors
 
 
 def readfile_raw(filename):
@@ -46,6 +47,25 @@ def process_raw(file_df, filename="test"):
     return processed_df
 
 
+def detect_beats(df):
+    """
+    Function that detects time of heartbeats
+
+    The function detects the time of heartbeats and returns a
+    list of times of the r_peak estimates of the QRS curve
+    of the heartbeat using the Hamiltonian Method
+
+    :param df: dataframe with columns time and voltage
+    :return: list of times with heartbeat
+    """
+    unfiltered_ecg = df['voltage']
+    freq = 1 / df['time'].diff().median()
+    detectors = Detectors(freq)
+    r_peaks = detectors.hamilton_detector(unfiltered_ecg)
+    times = df['time'][r_peaks]
+    return times
+
+
 def main(filename, output_name=None):
     """
     Driver function for program
@@ -58,7 +78,6 @@ def main(filename, output_name=None):
     :param output_name: output filename
     :return: json file as output
     """
-
     if output_name is None:
         output_name = ''.join(filename.split(".")[:-1] + [".json"])
     df = readfile_raw(filename)

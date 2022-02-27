@@ -5,3 +5,4 @@ numpy
 argparse
 coverage
 testfixtures
+py-ecg-detectors
