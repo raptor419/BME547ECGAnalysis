@@ -98,6 +98,25 @@ def get_metrics(df):
     return metrics
 
 
+def to_json(filename, data):
+    """
+    Function to save json file
+
+    This function takes in data in a dictionary format
+    and saves a json file with the given filename.
+    It also returns a json dump of the json string as
+    a text.
+
+    :param filename: filename to save json
+    :param data: dictionary with json data
+    :return: string with json dump
+    """
+    json_str = json.dumps(data, indent=4)
+    with open(filename, 'w+') as fp:
+        json.dump(data, fp, indent=4)
+    return json_str
+
+
 def main(filename, output_name=None):
     """
     Driver function for program
