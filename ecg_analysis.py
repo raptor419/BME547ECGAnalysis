@@ -3,6 +3,7 @@ import argparse
 import logging
 import pandas as pd
 from ecgdetectors import Detectors
+pd.set_option("display.precision", 16)
 
 
 def readfile_raw(filename):

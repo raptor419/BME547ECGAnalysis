@@ -120,6 +120,40 @@ def test_detect_beats(df, exp_series):
     np.allclose(list(series), list(exp_series), atol=0.001)
 
 
+df1 = process_raw(readfile_raw("test_data/test_data1.csv"))
+df1_exp = {
+    "duration": 27.775,
+    "min": -2.08,
+    "max": 2.308,
+    "beats": [
+        0.286, 1.05, 1.864,
+        2.647, 3.447, 4.231, 5.047,
+        5.697, 6.697, 7.544, 8.347,
+        9.147, 9.914, 10.747, 11.611,
+        12.431, 13.264, 14.081, 14.881,
+        15.678, 16.464, 17.283, 18.15,
+        18.981, 19.764, 20.561, 21.331,
+        22.114, 22.931, 23.747, 24.578,
+        25.414, 26.228, 26.997],
+    "num_beats": 34,
+    "mean_hr_bpm": 73.44734473447345
+}
+
+df_data = [(df1, df1_exp)]
+
+
+@pytest.mark.parametrize("df, exp", df_data)
+def test_get_metrics(df, exp):
+    from ecg_analysis import get_metrics
+    metrics = get_metrics(df)
+    assert (np.isclose(metrics['duration'], exp['duration']))
+    assert (np.isclose(metrics['min'], exp['min']))
+    assert (np.isclose(metrics['max'], exp['max']))
+    assert (np.isclose(metrics['num_beats'], exp['num_beats'], atol=1))
+    assert (np.isclose(metrics['mean_hr_bpm'], exp['mean_hr_bpm'], atol=10))
+    assert (np.allclose(metrics['beats'], metrics['beats'], atol=0.001))
+
+
 def test_main():
     from ecg_analysis import main
     for i in [1, 2, 3, 4, 5, 6, 7, 10,
