@@ -1,4 +1,6 @@
 # ECG Analysis Assignment
+![Work Flow Status](../../actions/workflows/pytest.yml/badge.svg)
+
 This is ECG Raw data analysis program implemented in python3
 
 ## Requirements
@@ -63,4 +65,5 @@ optional arguments:
 
 ## Citation:
 
-    P. Hamilton, "Open source ECG analysis," Computers in Cardiology, 2002, pp. 101-104, doi: 10.1109/CIC.2002.1166717. 
+    P. Hamilton, "Open source ECG analysis," Computers in Cardiology, 2002.
+    pp. 101-104, doi: 10.1109/CIC.2002.1166717. 
