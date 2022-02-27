@@ -83,7 +83,7 @@ def get_metrics(df):
     3. num_beats: number of detected beats in the strip, as a numeric value
     4. mean_hr_bpm: estimated average heart rate over the
     length of the strip as a numeric value
-    5. attribute beats: list of times when a beat occurred.
+    5. beats: list of times when a beat occurred.
 
     :param df: dataframe with columns time and voltage
     :return: a dict of metrics params
